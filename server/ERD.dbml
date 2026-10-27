@@ -1,0 +1,506 @@
+// ERD generated from server/src/entities/*.js and server/src/entities/index.js
+// Import this file into https://dbdiagram.io
+
+Table coupon_product {
+  fk_coupon_id int [pk, not null]
+  fk_product_id int [pk, not null]
+}
+
+Table customer_profile {
+  pk_customer_id int [pk, increment, not null]
+  fk_user_account_id int
+  customer_code varchar(50) [unique]
+  full_name varchar(150) [not null]
+  email varchar(255)
+  address varchar(255)
+  gender tinyint
+  dob date
+  phone_number varchar(20)
+  note text
+  status tinyint [default: 1]
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table custom_request {
+  pk_custom_request_id int [pk, increment, not null]
+  fk_customer_id int
+  request_code varchar(50) [unique]
+  total_estimated_price decimal(15,2) [default: 0]
+  address text
+  status tinyint [default: 1]
+  order_type tinyint [default: 3]
+  note text
+  deposit_amount decimal(15,2) [default: 0]
+  total_amount decimal(15,2) [default: 0]
+  expected_fulfillment_date datetime
+  fulfillment_method varchar(100)
+  fk_order_id int
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table custom_request_item {
+  pk_custom_request_item_id int [pk, increment, not null]
+  fk_custom_request_id int [not null]
+  fk_product_id int
+  fk_supplier_id int
+  item_name varchar(255)
+  item_img varchar(255)
+  item_quantity int [default: 1]
+  item_material varchar(100)
+  item_size json
+  item_color varchar(100)
+  item_price decimal(15,2) [default: 0]
+  item_cost_price decimal(15,2) [default: 0]
+  customer_img json
+  design_img json
+  is_finished tinyint [default: 0]
+  item_note text
+  item_is_bundle tinyint [default: 0]
+  item_bundle_items json
+  item_warranty int
+  expected_supplier_date datetime
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table employee {
+  employee_id int [pk, increment, not null]
+  employee_code varchar(20) [not null, unique]
+  full_name varchar(100) [not null]
+  role_name varchar(50) [not null]
+  role_type varchar(20) [not null, note: 'ENUM: SALES, ACCOUNTANT, SANDER, PAINTER']
+  base_rate int [not null, default: 0]
+  is_active tinyint [default: 1]
+  user_account_id int
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table import_receipt {
+  pk_receipt_id int [pk, increment, not null]
+  receipt_code varchar(50) [not null, unique]
+  import_date date [not null]
+  supplier_name varchar(255)
+  fk_manufacturing_order_id int
+  total_amount decimal(15,2) [default: 0]
+  total_qty int [default: 0]
+  invoice_img text
+  note text
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table manufacturing_order {
+  pk_manufacturing_order_id int [pk, increment, not null]
+  order_code varchar(50) [not null, unique]
+  fk_supplier_id int
+  status tinyint [default: 1]
+  total_amount decimal(15,2) [default: 0]
+  deposit_amount decimal(15,2) [default: 0]
+  expected_delivery_date datetime
+  note text
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table manufacturing_order_item {
+  pk_manufacturing_order_item_id int [pk, increment, not null]
+  fk_manufacturing_order_id int [not null]
+  fk_product_id int
+  fk_custom_request_item_id int
+  item_name varchar(255)
+  item_material varchar(100)
+  item_size json
+  item_color varchar(100)
+  quantity int [default: 1]
+  import_price decimal(15,2) [default: 0]
+  expected_date datetime
+  item_is_bundle int [default: 0]
+  item_bundle_items json
+  note text
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table notification {
+  pk_notification_id int [pk, increment, not null]
+  fk_user_id int
+  title varchar(255) [not null]
+  message text [not null]
+  type varchar(20) [default: 'INFO', note: 'ENUM: INFO, SUCCESS, WARNING, ERROR']
+  link varchar(255)
+  is_read boolean [default: false]
+  status tinyint [default: 1]
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  createby int
+}
+
+Table orders {
+  pk_order_id int [pk, increment, not null, note: 'Physical table name: order']
+  fk_customer_id int
+  fk_user_account_id int
+  order_code varchar(50) [unique]
+  fulfillment_method varchar(100)
+  expected_fulfillment_date datetime
+  note text
+  deposit_amount decimal(15,2) [default: 0]
+  address varchar(255)
+  received_amount decimal(15,2) [default: 0]
+  delivery_image json
+  total_amount decimal(15,2) [default: 0]
+  order_status tinyint [default: 1]
+  order_type tinyint [default: 2]
+  status tinyint [default: 1]
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+  deposit_resolution varchar(50)
+  cancel_reason varchar(255)
+}
+
+Table order_history {
+  pk_order_history_id int [pk, increment, not null]
+  fk_order_id int [not null]
+  action varchar(255)
+  old_status tinyint
+  new_status tinyint
+  changed_by int
+  changed_at datetime [default: `CURRENT_TIMESTAMP`]
+  note text
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table order_item {
+  pk_order_item_id int [pk, increment, not null]
+  fk_product_id int
+  fk_order_id int [not null]
+  customer_img json
+  design_img json
+  item_img text
+  item_name varchar(255)
+  item_quantity int [default: 1]
+  item_material varchar(100)
+  item_size json
+  item_color varchar(100)
+  item_price decimal(15,2) [default: 0]
+  item_note text
+  item_is_bundle tinyint [default: 0]
+  item_bundle_items json
+  item_is_gift tinyint [default: 0]
+  is_finished tinyint [default: 0]
+  item_warranty int
+  status tinyint [default: 1]
+  import_status tinyint [default: 0]
+  fk_custom_request_item_id int
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table order_item_processing {
+  pk_processing_id int [pk, increment, not null]
+  fk_order_item_id int [not null]
+  fk_user_account_id int
+  processing_status tinyint [default: 1]
+  cancel_note text
+  quantity int [default: 1]
+  start_date datetime
+  end_date datetime
+  note text
+  finished_img text
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table payroll_period {
+  period_id int [pk, increment, not null]
+  period_month varchar(7) [not null, unique]
+  status varchar(10) [not null, default: 'DRAFT', note: 'ENUM: DRAFT, LOCKED']
+  locked_at datetime
+  locked_by int
+  note varchar(500)
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  createby int
+  modifiedate datetime
+  modifieby int
+}
+
+Table product {
+  pk_product_id int [pk, increment, not null]
+  fk_category_id int
+  fk_color_id int
+  fk_material_id int
+  fk_room_id int
+  sku varchar(100) [unique]
+  product_name varchar(255) [not null]
+  product_img text
+  description text
+  is_bundle tinyint [default: 0]
+  bundle_items json
+  stock_quantity int [default: 0]
+  is_gift tinyint [default: 0]
+  product_type varchar(20) [default: 'CUSTOM']
+  warranty_months int
+  size json
+  product_status tinyint [default: 1]
+  min_stock int [default: 0]
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table product_category {
+  pk_product_category_id int [pk, increment, not null]
+  category_name varchar(150) [not null]
+  status tinyint [default: 1]
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table product_color {
+  pk_product_color_id int [pk, increment, not null]
+  color_name varchar(150) [not null]
+  status tinyint [default: 1]
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table product_coupon {
+  pk_coupon_id int [pk, increment, not null]
+  coupon_code varchar(50) [not null, unique]
+  coupon_name varchar(255)
+  description text
+  discount_percent decimal(5,2) [not null, default: 0]
+  start_date datetime
+  end_date datetime
+  status tinyint [default: 1]
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table product_item {
+  pk_item_id int [pk, increment, not null]
+  fk_product_id int
+  item_name varchar(255)
+  fk_order_item_id int
+  cost_price decimal(15,2) [default: 0]
+  batch_code varchar(100)
+  item_serial varchar(100) [unique]
+  item_status tinyint [default: 1]
+  note text
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table product_material {
+  pk_product_material_id int [pk, increment, not null]
+  material_name varchar(150) [not null]
+  status tinyint [default: 1]
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table product_pricing {
+  pk_pricing_id int [pk, increment, not null]
+  fk_product_id int [not null]
+  fk_user_account_id int
+  cost_price decimal(15,2) [default: 0]
+  profit_margin decimal(5,2) [default: 0]
+  operating_margin decimal(5,2) [default: 0]
+  raw_price decimal(15,2) [default: 0]
+  final_price decimal(15,2) [default: 0]
+  status tinyint [default: 1]
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table product_room {
+  pk_product_room_id int [pk, increment, not null]
+  room_name varchar(150) [not null]
+  status tinyint [default: 1]
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table refresh_token {
+  refresh_token_id int [pk, increment, not null]
+  user_account_id int [not null]
+  token varchar(500) [not null]
+  expires_at datetime [not null]
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table salary_adjustment {
+  adjustment_id int [pk, increment, not null]
+  fk_record_id int [not null]
+  type varchar(20) [not null, note: 'ENUM: BONUS, ALLOWANCE, PENALTY']
+  description varchar(200) [not null]
+  amount int [not null]
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  createby int
+}
+
+Table salary_record {
+  record_id int [pk, increment, not null]
+  fk_period_id int [not null]
+  fk_employee_id int [not null]
+  base_rate_snapshot int [not null, default: 0]
+  days_worked decimal(4,1) [default: 0]
+  overtime_hours decimal(5,1) [default: 0]
+  status varchar(10) [not null, default: 'PENDING', note: 'ENUM: PENDING, PAID']
+  payment_date date
+  paid_by int
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+
+  indexes {
+    (fk_period_id, fk_employee_id) [unique]
+  }
+}
+
+Table supplier {
+  pk_supplier_id int [pk, increment, not null]
+  supplier_name varchar(255) [not null]
+  contact_person varchar(255)
+  phone_number varchar(20)
+  email varchar(255)
+  address varchar(255)
+  tax_code varchar(50)
+  note text
+  status tinyint [default: 1]
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+}
+
+Table system_log {
+  system_log_id int [pk, increment, not null]
+  user_account_id int
+  action varchar(255) [not null]
+  level varchar(50) [default: 'INFO']
+  detail text
+  ip_address varchar(50)
+  user_agent text
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+}
+
+Table user_account {
+  user_account_id int [pk, increment, not null]
+  role_id int [not null]
+  email varchar(255) [not null, unique]
+  password_hash varchar(255) [not null]
+  status tinyint [default: 1]
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table user_profile {
+  user_profile_id int [pk, increment, not null]
+  user_account_id int [not null]
+  full_name varchar(150)
+  phone_number varchar(20)
+  dob date
+  gender tinyint
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+  createby int
+  modifieby int
+}
+
+Table user_role {
+  role_id int [pk, increment, not null]
+  role_code varchar(50) [not null]
+  role_name varchar(100) [not null]
+  description text
+  createdate datetime [default: `CURRENT_TIMESTAMP`]
+  modifiedate datetime
+}
+
+Ref: user_account.role_id > user_role.role_id
+Ref: user_profile.user_account_id - user_account.user_account_id
+Ref: refresh_token.user_account_id > user_account.user_account_id
+Ref: customer_profile.fk_user_account_id - user_account.user_account_id
+Ref: system_log.user_account_id > user_account.user_account_id
+
+Ref: product.fk_category_id > product_category.pk_product_category_id
+Ref: product.fk_color_id > product_color.pk_product_color_id
+Ref: product.fk_material_id > product_material.pk_product_material_id
+Ref: product.fk_room_id > product_room.pk_product_room_id
+Ref: product_item.fk_product_id > product.pk_product_id
+Ref: product_item.fk_order_item_id > order_item.pk_order_item_id
+Ref: product_pricing.fk_product_id > product.pk_product_id
+
+Ref: orders.fk_customer_id > customer_profile.pk_customer_id
+Ref: orders.fk_user_account_id > user_account.user_account_id
+Ref: order_item.fk_order_id > orders.pk_order_id
+Ref: order_item.fk_product_id > product.pk_product_id
+Ref: order_history.fk_order_id > orders.pk_order_id
+Ref: order_item_processing.fk_order_item_id > order_item.pk_order_item_id
+Ref: order_item_processing.fk_user_account_id > user_account.user_account_id
+
+Ref: custom_request.fk_customer_id > customer_profile.pk_customer_id
+Ref: custom_request.fk_order_id - orders.pk_order_id
+Ref: custom_request_item.fk_custom_request_id > custom_request.pk_custom_request_id
+Ref: custom_request_item.fk_supplier_id > supplier.pk_supplier_id
+Ref: order_item.fk_custom_request_item_id - custom_request_item.pk_custom_request_item_id
+
+Ref: coupon_product.fk_product_id > product.pk_product_id
+Ref: coupon_product.fk_coupon_id > product_coupon.pk_coupon_id
+
+Ref: employee.user_account_id > user_account.user_account_id
+Ref: salary_record.fk_period_id > payroll_period.period_id
+Ref: salary_record.fk_employee_id > employee.employee_id
+Ref: salary_adjustment.fk_record_id > salary_record.record_id
+Ref: notification.fk_user_id > user_account.user_account_id
+
+Ref: manufacturing_order.fk_supplier_id > supplier.pk_supplier_id
+Ref: manufacturing_order_item.fk_manufacturing_order_id > manufacturing_order.pk_manufacturing_order_id
+Ref: manufacturing_order_item.fk_product_id > product.pk_product_id
+Ref: manufacturing_order_item.fk_custom_request_item_id - custom_request_item.pk_custom_request_item_id
+Ref: import_receipt.fk_manufacturing_order_id > manufacturing_order.pk_manufacturing_order_id
+
+// Note: employee.user_account_id uses constraints:false in Sequelize.
+// The 1:1 relations are associations in index.js; uniqueness is not always
+// enforced by the database because the FK columns are not unique indexes.
